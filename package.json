@@ -1,0 +1,25 @@
+{ 
+  "name": "flashfreeze",
+  "description": "TODO",
+  "version": "0.0.1",
+  "licenses": [{
+    "type": "MIT",
+    "url": "https://github.com/jamesbloomer/flashfreeze/blob/master/LICENCE"
+  }],
+  "author": { "name": "James Bloomer", "url": "https://github.com/jamesbloomer" },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jamesbloomer/flashfreeze.git" 
+  },
+  "keywords": [""],
+  "dependencies": {
+    "directory-tree-watcher" : "0.1.0"
+  },
+  "devDependencies" : {
+		"mocha" : "x.x.x",
+		"sinon" : "x.x.x"
+	},
+  "main": "./flashfreeze.js",
+  "scripts": { "test": "mocha test/*" },
+  "engines": { "node": ">= 0.8.x" }
+}
