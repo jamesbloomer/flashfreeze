@@ -1,26 +1,27 @@
 var assert = require('assert'),
-	flashfreeze = require('../flashfreeze.js'),
+	flashfreeze = require('../lib/flashfreeze.js'),
 	mocha = require('mocha'),
-	watcher = require('directory-tree-watcher'),
 	sinon = require('sinon');
 
 describe('flashfreeze', function() {
 	describe('#start()', function() {
+		var clock;
 
 		beforeEach(function(){
-			sinon.stub(flashfreeze, 'watch').yields('EVENT', 'FILE');
+			sinon.stub(flashfreeze, 'commit');
+			clock = sinon.useFakeTimers();
 		});
 
 		afterEach(function(){
-			flashfreeze.watch.restore();
+			flashfreeze.commit.restore();
+			clock.restore();
 		});
 
-		it('should start watching the folder passed in', function(done) {
-			flashfreeze.start('FOLDER', function() {
-				// TODO need to stop the readline
-				assert(flashfreeze.watch.calledOnce());
-				done();	
-			});
+		it('should call commit once timer has elapsed', function(done) {
+			flashfreeze.start('FOLDER', 1);
+			clock.tick(60 * 1000);
+			assert(flashfreeze.commit.calledOnce);
+			done();
 		});
 	});
 });
