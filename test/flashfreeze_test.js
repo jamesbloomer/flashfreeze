@@ -29,24 +29,65 @@ describe('flashfreeze', function() {
 
 	describe('#commit()', function() {
 
-		var git;
+		describe('when successful', function() {
 
-		beforeEach(function(){
-			git = new Git();
-			sinon.stub(git, 'exec').yields();
-			flashfreeze.git = git;
+			var git;
+
+			beforeEach(function(){
+				git = new Git();
+				sinon.stub(git, 'exec').yields();
+				flashfreeze.git = git;
+				flashfreeze.commit('FOLDER');
+			});
+
+			afterEach(function(){
+				git.exec.restore();
+				flashfreeze.git = null;
+			});
+
+			it('should call git exec 3 times', function(done) {
+				assert(flashfreeze.git.exec.calledThrice);
+				done();
+			});
+
+			it('should call git add -A first', function(done) {
+				assert(flashfreeze.git.exec.getCall(0).calledWith('add', {A: true}));
+				done();
+			});
+
+			it('should call git commit second', function(done) {
+				assert(flashfreeze.git.exec.getCall(1).calledWith('commit', {m : true}, ['commit by flashfreeze']));
+				done();
+			});
+
+			it('should call git push third', function(done) {
+				assert(flashfreeze.git.exec.getCall(2).calledWith('push',  ['origin', 'master']));
+				done();
+			});
 		});
 
-		afterEach(function(){
-			git.exec.restore();
-			flashfreeze.git = null;
-		});
+		describe('when errors', function() {
 
-		it('should call git add -A', function(done) {
-			flashfreeze.commit('FOLDER');
-			assert(flashfreeze.git.exec.calledThrice);
-			assert(flashfreeze.git.exec.getCall(0).calledWith('add', {A: true}));
-			done();
+			var git;
+
+			beforeEach(function(){
+				sinon.stub(process, 'exit').returns();
+				git = new Git();
+				sinon.stub(git, 'exec').yields('ERROR');
+				flashfreeze.git = git;
+				flashfreeze.commit('FOLDER');
+			});
+
+			afterEach(function(){
+				process.exit.restore();
+				git.exec.restore();
+				flashfreeze.git = null;
+			});
+
+			it('should exit the process', function(done) {
+				assert(process.exit.calledOnce);
+				done();
+			});
 		});
 	});
 });
