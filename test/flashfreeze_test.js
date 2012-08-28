@@ -1,5 +1,7 @@
-var assert = require('assert'),
+var async = require('async'),
+	assert = require('assert'),
 	flashfreeze = require('../lib/flashfreeze.js'),
+	Git = require('git-wrapper'),
 	mocha = require('mocha'),
 	sinon = require('sinon');
 
@@ -21,6 +23,29 @@ describe('flashfreeze', function() {
 			flashfreeze.start('FOLDER', 1);
 			clock.tick(60 * 1000);
 			assert(flashfreeze.commit.calledOnce);
+			done();
+		});
+	});
+
+	describe('#commit()', function() {
+
+		var git;
+
+		beforeEach(function(){
+			git = new Git();
+			sinon.stub(git, 'exec').yields();
+			flashfreeze.git = git;
+		});
+
+		afterEach(function(){
+			git.exec.restore();
+			flashfreeze.git = null;
+		});
+
+		it('should call git add -A', function(done) {
+			flashfreeze.commit('FOLDER');
+			assert(flashfreeze.git.exec.calledThrice);
+			assert(flashfreeze.git.exec.getCall(0).calledWith('add', {A: true}));
 			done();
 		});
 	});
