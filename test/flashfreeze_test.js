@@ -70,7 +70,7 @@ describe('flashfreeze', function() {
 			});
 
 			it('should call git commit second', function(done) {
-				assert(flashfreeze.git.exec.getCall(1).calledWith('commit', {m : "flashfreeze"}, []));
+				assert(flashfreeze.git.exec.getCall(1).calledWith('commit', {m : '"commit by flashfreeze"'}, []));
 				done();
 			});
 
