@@ -15,7 +15,8 @@
   "dependencies": {
     "async": "0.1.22",
     "commander": "1.0.2",
-    "git-wrapper": "0.1.0"
+    "git-wrapper": "0.1.0",
+    "winston": "0.6.2"
   },
   "devDependencies" : {
 		"mocha" : "x.x.x",

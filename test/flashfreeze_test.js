@@ -3,15 +3,18 @@ var async = require('async'),
 	flashfreeze = require('../lib/flashfreeze.js'),
 	Git = require('git-wrapper'),
 	mocha = require('mocha'),
-	sinon = require('sinon');
+	sinon = require('sinon'),
+	winston = require('winston');
 
 describe('flashfreeze', function() {
 	beforeEach(function(){
-		sinon.stub(console, 'log');
+		sinon.stub(winston, 'error');
+		sinon.stub(winston, 'info');
 	});
 
 	afterEach(function(){
-		console.log.restore();
+		winston.error.restore();
+		winston.info.restore();
 	});
 
 	describe('#start()', function() {
@@ -98,8 +101,8 @@ describe('flashfreeze', function() {
 				flashfreeze.git = null;
 			});
 
-			it('should exit the process', function(done) {
-				assert(process.exit.calledOnce);
+			it('should not exit the process', function(done) {
+				assert(!process.exit.called);
 				done();
 			});
 		});
