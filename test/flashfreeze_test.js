@@ -6,15 +6,29 @@ var async = require('async'),
 	sinon = require('sinon');
 
 describe('flashfreeze', function() {
+	beforeEach(function(){
+		sinon.stub(console, 'log');
+	});
+
+	afterEach(function(){
+		console.log.restore();
+	});
+
 	describe('#start()', function() {
+		
 		var clock;
+		var git;
 
 		beforeEach(function(){
+			sinon.stub(process, 'chdir').returns();
+			sinon.stub(flashfreeze, 'checkFolder').yields();
 			sinon.stub(flashfreeze, 'commit');
 			clock = sinon.useFakeTimers();
 		});
 
 		afterEach(function(){
+			process.chdir.restore();
+			flashfreeze.checkFolder.restore();
 			flashfreeze.commit.restore();
 			clock.restore();
 		});
@@ -56,7 +70,7 @@ describe('flashfreeze', function() {
 			});
 
 			it('should call git commit second', function(done) {
-				assert(flashfreeze.git.exec.getCall(1).calledWith('commit', {m : true}, ['commit by flashfreeze']));
+				assert(flashfreeze.git.exec.getCall(1).calledWith('commit', {m : "flashfreeze"}, []));
 				done();
 			});
 
