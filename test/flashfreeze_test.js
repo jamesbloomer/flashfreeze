@@ -1,5 +1,6 @@
 var async = require('async'),
 	assert = require('assert'),
+	child_process = require('child_process'),
 	flashfreeze = require('../lib/flashfreeze.js'),
 	Git = require('git-wrapper'),
 	mocha = require('mocha'),
@@ -51,54 +52,46 @@ describe('flashfreeze', function() {
 			var git;
 
 			beforeEach(function(){
-				git = new Git();
-				sinon.stub(git, 'exec').yields();
-				flashfreeze.git = git;
+				sinon.stub(child_process, 'exec').yields();
 				flashfreeze.commit('FOLDER');
 			});
 
 			afterEach(function(){
-				git.exec.restore();
-				flashfreeze.git = null;
+				child_process.exec.restore();
 			});
 
-			it('should call git exec 3 times', function(done) {
-				assert(flashfreeze.git.exec.calledThrice);
+			it('should call child_process exec 3 times', function(done) {
+				assert(child_process.exec.calledThrice);
 				done();
 			});
 
 			it('should call git add -A first', function(done) {
-				assert(flashfreeze.git.exec.getCall(0).calledWith('add', {A: true}));
+				assert(child_process.exec.getCall(0).calledWith('git add -A'));
 				done();
 			});
 
 			it('should call git commit second', function(done) {
-				assert(flashfreeze.git.exec.getCall(1).calledWith('commit', {m : '"commit by flashfreeze"'}, []));
+				assert(child_process.exec.getCall(1).calledWith('git commit -m "commit by flashfreeze"'));
 				done();
 			});
 
 			it('should call git push third', function(done) {
-				assert(flashfreeze.git.exec.getCall(2).calledWith('push',  ['origin', 'master']));
+				assert(child_process.exec.getCall(2).calledWith('git push origin master'));
 				done();
 			});
 		});
 
 		describe('when errors', function() {
 
-			var git;
-
 			beforeEach(function(){
 				sinon.stub(process, 'exit').returns();
-				git = new Git();
-				sinon.stub(git, 'exec').yields('ERROR');
-				flashfreeze.git = git;
+				sinon.stub(child_process, 'exec').yields('ERROR');
 				flashfreeze.commit('FOLDER');
 			});
 
 			afterEach(function(){
 				process.exit.restore();
-				git.exec.restore();
-				flashfreeze.git = null;
+				child_process.exec.restore();
 			});
 
 			it('should not exit the process', function(done) {
