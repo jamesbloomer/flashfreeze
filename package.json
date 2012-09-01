@@ -1,6 +1,6 @@
 { 
   "name": "flashfreeze",
-  "description": "TODO",
+  "description": "Easy background backup and version control for your files",
   "version": "0.5.0",
   "licenses": [{
     "type": "MIT",
