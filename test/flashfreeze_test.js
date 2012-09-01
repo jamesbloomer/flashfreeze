@@ -2,7 +2,6 @@ var async = require('async'),
 	assert = require('assert'),
 	child_process = require('child_process'),
 	flashfreeze = require('../lib/flashfreeze.js'),
-	Git = require('git-wrapper'),
 	mocha = require('mocha'),
 	sinon = require('sinon'),
 	winston = require('winston');
@@ -24,24 +23,114 @@ describe('flashfreeze', function() {
 		var git;
 
 		beforeEach(function(){
-			sinon.stub(process, 'chdir').returns();
-			sinon.stub(flashfreeze, 'checkFolder').yields();
 			sinon.stub(flashfreeze, 'commit');
 			clock = sinon.useFakeTimers();
 		});
 
 		afterEach(function(){
-			process.chdir.restore();
-			flashfreeze.checkFolder.restore();
 			flashfreeze.commit.restore();
 			clock.restore();
 		});
 
-		it('should call commit once timer has elapsed', function(done) {
-			flashfreeze.start('FOLDER', 1);
-			clock.tick(60 * 1000);
-			assert(flashfreeze.commit.calledOnce);
-			done();
+		describe('with a valid folder', function() {
+
+			beforeEach(function(){
+				sinon.stub(process, 'chdir').returns();
+				sinon.stub(flashfreeze, 'checkFolder').yields();
+				flashfreeze.start('FOLDER', 1);
+			});
+
+			afterEach(function(){
+				process.chdir.restore();
+				flashfreeze.checkFolder.restore();
+			});
+
+			it('should call commit once timer has elapsed', function(done) {
+				clock.tick(60 * 1000);
+				assert(flashfreeze.commit.calledOnce);
+				done();
+			});
+
+			it('should change directory to folder', function(done) {
+				assert(process.chdir.calledOnce);
+				assert(process.chdir.calledWith('FOLDER'));
+				done();
+			});
+		});
+
+		describe('with an invalid folder', function() {
+
+			beforeEach(function(){
+				sinon.stub(process, 'chdir').throws('ERROR');
+				sinon.stub(flashfreeze, 'checkFolder').yields();
+				sinon.stub(process, 'exit').returns();
+				flashfreeze.start('FOLDER', 1);
+			});
+
+			afterEach(function(){
+				process.chdir.restore();
+				flashfreeze.checkFolder.restore();
+				process.exit.restore();
+			});
+
+			it('should exit process', function() {
+				assert(process.exit.calledOnce);
+			});
+		});
+
+		describe('with a folder that is not a git directory', function() {
+
+			beforeEach(function(){
+				sinon.stub(process, 'chdir').returns();
+				sinon.stub(flashfreeze, 'checkFolder').yields('ERROR');
+				sinon.stub(process, 'exit').returns();
+				flashfreeze.start('FOLDER', 1);
+			});
+
+			afterEach(function(){
+				process.chdir.restore();
+				flashfreeze.checkFolder.restore();
+				process.exit.restore();
+			});
+
+			it('should exit process', function() {
+				assert(process.exit.calledOnce);
+			});
+		});
+	});
+
+	describe('#checkFolder()', function() {
+		describe('with a folder that is a git directory', function() {
+			beforeEach(function() {
+				sinon.stub(child_process, 'exec').yields();
+			});
+
+			afterEach(function() {
+				child_process.exec.restore();
+			});
+
+			it('should not throw', function(done) {
+				flashfreeze.checkFolder('GITFOLDER', function(err) {
+					assert(!err);
+					done();
+				});
+			});
+		});
+
+		describe('with a folder that is not a git directory', function() {
+			beforeEach(function() {
+				sinon.stub(child_process, 'exec').yields('ERROR');
+			});
+
+			afterEach(function() {
+				child_process.exec.restore();
+			});
+
+			it('should throw an error', function() {
+				flashfreeze.checkFolder('NOTAGITFOLDER', function(err) {
+					assert.equal(err, 'ERROR');
+				});
+			});
 		});
 	});
 
@@ -98,6 +187,17 @@ describe('flashfreeze', function() {
 				assert(!process.exit.called);
 				done();
 			});
+		});
+	});
+
+	describe('#didCommitFailBecauseThereIsNothingToCommit()', function() {
+
+		it('when there is nothing to commit should return true', function() {
+			assert(flashfreeze.didCommitFailBecauseThereIsNothingToCommit('nothing to commit'));
+		});
+
+		it('when there is something to commit should return false', function() {
+			assert(!flashfreeze.didCommitFailBecauseThereIsNothingToCommit('Error'));
 		});
 	});
 });
