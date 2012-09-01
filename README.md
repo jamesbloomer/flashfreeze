@@ -1,18 +1,32 @@
-flashfreeze
-===========
+# flashfreeze
 
-A node.js version of Flashbake
+A node.js version of Flashbake.
 
-....not ready to use yet.
+Background backup and version control for your files.
 
-# TODO
+Designed for anyone working on files and wanting incremental backups eg. writers. Hopefully (eventually) usable by non-technical users.
 
-- If there's nothing to commit it fails
-- Change the commit message
+Flashfreeze adds, commits and pushes the entire contents of a directory to git at a given interval.
+
+
+## Install
+```
+npm install flash freeze
+```
+
+## Usage
+```
+	node flashfreeze -f [directory to backup] -i [interval in minutes]
+```
+
+## TODO
+
+- Allow changing the commit message
+- Install and setup guide for non-technical users
 - Plugins
 
 
-# LICENCE
+## LICENCE
 
 (The MIT License)
 
