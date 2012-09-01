@@ -1,12 +1,12 @@
 # flashfreeze
 
-A node.js version of Flashbake.
+Easy background backup and version control for your files. 
 
-Background backup and version control for your files.
-
-Designed for anyone working on files and wanting incremental backups eg. writers. Hopefully (eventually) usable by non-technical users.
+Designed for anyone working on files and wanting incremental background backups eg. writers. Hopefully (eventually) usable by non-technical users. 
 
 Flashfreeze adds, commits and pushes the entire contents of a directory to git at a given interval.
+
+Inspired by [Flashbake](https://github.com/commandline/flashbake).
 
 
 ## Install
@@ -16,7 +16,7 @@ npm install flash freeze
 
 ## Usage
 ```
-	node flashfreeze -f [directory to backup] -i [interval in minutes]
+node flashfreeze -f [directory to backup] -i [interval in minutes]
 ```
 
 ## TODO
@@ -25,6 +25,7 @@ npm install flash freeze
 - Install and setup guide for non-technical users
 - Plugins
 
+See [issues](https://github.com/jamesbloomer/flashfreeze/issues) for full list.
 
 ## LICENCE
 
