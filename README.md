@@ -19,9 +19,11 @@ npm install flash freeze
 node flashfreeze -f [directory to backup] -i [interval in minutes]
 ```
 
+The commit message is read from a file ```status.txt``` in the directory to backup. If the file does not exist then a fixed commit message is used. 
+
+
 ## TODO
 
-- Allow changing the commit message
 - Install and setup guide for non-technical users
 - Plugins
 

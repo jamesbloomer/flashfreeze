@@ -1,7 +1,7 @@
 { 
   "name": "flashfreeze",
   "description": "Easy background backup and version control for your files",
-  "version": "0.5.1",
+  "version": "1.0.0",
   "licenses": [{
     "type": "MIT",
     "url": "https://github.com/jamesbloomer/flashfreeze/blob/master/LICENCE"
