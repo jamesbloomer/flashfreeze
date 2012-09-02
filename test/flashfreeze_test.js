@@ -2,6 +2,7 @@ var async = require('async'),
 	assert = require('assert'),
 	child_process = require('child_process'),
 	flashfreeze = require('../lib/flashfreeze.js'),
+	fs = require('fs'),
 	mocha = require('mocha'),
 	sinon = require('sinon'),
 	winston = require('winston');
@@ -142,11 +143,13 @@ describe('flashfreeze', function() {
 
 			beforeEach(function(){
 				sinon.stub(child_process, 'exec').yields();
+				sinon.stub(flashfreeze, 'getStatus').yields('STATUS');
 				flashfreeze.commit('FOLDER');
 			});
 
 			afterEach(function(){
 				child_process.exec.restore();
+				flashfreeze.getStatus.restore();
 			});
 
 			it('should call child_process exec 3 times', function(done) {
@@ -160,7 +163,7 @@ describe('flashfreeze', function() {
 			});
 
 			it('should call git commit second', function(done) {
-				assert(child_process.exec.getCall(1).calledWith('git commit -m "commit by flashfreeze"'));
+				assert(child_process.exec.getCall(1).calledWith('git commit -m "STATUS"'));
 				done();
 			});
 
@@ -198,6 +201,67 @@ describe('flashfreeze', function() {
 
 		it('when there is something to commit should return false', function() {
 			assert(!flashfreeze.didCommitFailBecauseThereIsNothingToCommit('Error'));
+		});
+	});
+
+	describe('#getStatus()', function() {
+		describe('when status file does not exist', function() {
+
+			beforeEach(function() {
+				sinon.stub(fs, 'exists').yields(false);
+			});
+
+			afterEach(function() {
+				fs.exists.restore();
+			});
+
+			it('should return fixed status', function(done) {
+				flashfreeze.getStatus(function(status) {
+					assert.equal('commit by flashfreeze', status);
+					done();
+				});
+			});
+		});
+
+		describe('when status file exists should return contents', function() {
+
+			beforeEach(function() {
+				sinon.stub(fs, 'exists').yields(true);
+				sinon.stub(fs, 'readFileSync').returns('STATUS');
+			});
+
+			afterEach(function() {
+				fs.exists.restore();
+				fs.readFileSync.restore();
+			});
+
+			it('should return fixed status', function(done) {
+				flashfreeze.getStatus(function(status) {
+					assert.equal('STATUS', status);
+					done();
+				});
+			});
+		});
+
+		describe('when status file exists but read throws should return fixed message and log', function() {
+
+			beforeEach(function() {
+				sinon.stub(fs, 'exists').yields(true);
+				sinon.stub(fs, 'readFileSync').throws('ERROR');
+			});
+
+			afterEach(function() {
+				fs.exists.restore();
+				fs.readFileSync.restore();
+			});
+
+			it('should return fixed status', function(done) {
+				flashfreeze.getStatus(function(status) {
+					assert.equal('commit by flashfreeze', status);
+					assert(winston.error.calledOnce);
+					done();
+				});
+			});
 		});
 	});
 });
