@@ -11,7 +11,7 @@ Inspired by [Flashbake](https://github.com/commandline/flashbake).
 
 ## Install
 ```
-npm install flash freeze
+npm install flashfreeze
 ```
 
 ## Usage
